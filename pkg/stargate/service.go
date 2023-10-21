@@ -62,7 +62,7 @@ func createServiceMeta(stargate *api.Stargate) meta.Tags {
 	var annotations map[string]string
 	if meta := stargate.Spec.ResourceMeta; meta != nil {
 		labels = utils.MergeMap(labels, meta.CommonLabels, meta.Service.Labels)
-		annotations = meta.Service.Annotations
+		annotations = utils.MergeMap(meta.CommonAnnotations, meta.Service.Annotations)
 
 	}
 

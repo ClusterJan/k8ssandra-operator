@@ -103,7 +103,7 @@ func NewDeployments(stargate *api.Stargate, dc *cassdcapi.CassandraDatacenter, l
 			ObjectMeta: metav1.ObjectMeta{
 				Name:        deploymentName,
 				Namespace:   stargate.Namespace,
-				Annotations: map[string]string{},
+				Annotations: createDeploymentAnnotations(stargate),
 				Labels:      createDeploymentLabels(stargate),
 			},
 
@@ -476,6 +476,15 @@ func createDeploymentLabels(stargate *api.Stargate) map[string]string {
 	return commonLabels
 }
 
+func createDeploymentAnnotations(stargate *api.Stargate) map[string]string {
+	commonAnnotations := map[string]string{}
+
+	if m := stargate.Spec.ResourceMeta; m != nil && m.CommonAnnotations != nil {
+		return utils.MergeMap(commonAnnotations, m.CommonAnnotations)
+	}
+	return commonAnnotations
+}
+
 func createPodMeta(stargate *api.Stargate, deploymentName string) meta.Tags {
 	labels := map[string]string{
 		coreapi.NameLabel:           coreapi.NameLabelValue,
@@ -488,7 +497,7 @@ func createPodMeta(stargate *api.Stargate, deploymentName string) meta.Tags {
 	var annotations map[string]string
 	if m := stargate.Spec.ResourceMeta; m != nil {
 		labels = utils.MergeMap(labels, m.CommonLabels, m.Pods.Labels)
-		annotations = m.Pods.Annotations
+		annotations = utils.MergeMap(m.CommonAnnotations, m.Pods.Annotations)
 	}
 
 	return meta.Tags{Labels: labels, Annotations: annotations}

@@ -2,6 +2,7 @@ package reaper
 
 import (
 	"fmt"
+	"github.com/k8ssandra/k8ssandra-operator/pkg/utils"
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
@@ -370,7 +371,7 @@ func getPodMeta(reaper *api.Reaper) meta.Tags {
 
 	var podAnnotations map[string]string
 	if meta := reaper.Spec.ResourceMeta; meta != nil {
-		podAnnotations = meta.Pods.Annotations
+		podAnnotations = utils.MergeMap(meta.CommonAnnotations, meta.Pods.Annotations)
 
 	}
 
